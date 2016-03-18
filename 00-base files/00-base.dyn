@@ -1,0 +1,107 @@
+<Workspace Version="0.9.1.4062" X="-358.414594119007" Y="-153.623782727868" zoom="1.48620554585284" Name="Home" Description="" RunType="Automatic" RunPeriod="1000" HasRunWithoutCrash="True">
+  <NamespaceResolutionMap />
+  <Elements>
+    <CoreNodeModels.Input.StringInput guid="e6145fc9-7ac9-42e7-b8da-9ee0186a41a8" type="CoreNodeModels.Input.StringInput" nickname="String" x="215.382264848038" y="-4.55303785204978" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false">
+      <System.String>C:\Users\danil\Documents\GitHub\space-syntax\00-base files\king_5.obj</System.String>
+      <System.String value="C:\Users\danil\Documents\GitHub\space-syntax\00-base files\king_5.obj" />
+    </CoreNodeModels.Input.StringInput>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="873e3677-63a6-4b28-925a-927a1883bf4a" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="Mesh.ImportFile" x="481.201931245877" y="7.65463024687659" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" assembly="..\..\..\..\AppData\Roaming\Dynamo\0.9\packages\MeshToolkitR2\bin\MeshToolkitR2.dll" function="Autodesk.Dynamo.MeshToolkitR2.Mesh.ImportFile@string" />
+    <CoreNodeModels.Input.StringInput guid="f7dc4ef6-0505-47c2-9e3f-0b75f5cd4d2f" type="CoreNodeModels.Input.StringInput" nickname="String" x="217.202818440066" y="219.124153307456" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false">
+      <System.String>C:\Users\danil\Documents\GitHub\space-syntax\00-base files\points_5.json</System.String>
+      <System.String value="C:\Users\danil\Documents\GitHub\space-syntax\00-base files\points_5.json" />
+    </CoreNodeModels.Input.StringInput>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="eaa7bb40-7c11-457b-8a7c-33a1e3926bb5" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="File.ReadText" x="454.412624202021" y="218.501651501371" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" assembly="DSCoreNodes.dll" function="DSCore.IO.File.ReadText@var" />
+    <PythonNodeModels.PythonNode guid="cbf5ccf5-4751-4723-b129-08d5aadeaea9" type="PythonNodeModels.PythonNode" nickname="Python Script" x="708.043033947134" y="123.247130792813" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" inputcount="1">
+      <Script>import clr
+
+import sys
+sys.path.append('C:\Program Files (x86)\IronPython 2.7\Lib') 
+
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+import json
+
+pts_data = json.loads(IN[0])
+
+pts = []
+
+
+
+for key in pts_data.keys():
+	pt = pts_data[key]
+	pts.append(Point.ByCoordinates(pt[0], pt[1], pt[2]))
+
+#Assign your output to the OUT variable.
+OUT = pts</Script>
+    </PythonNodeModels.PythonNode>
+    <CoreNodeModels.Input.StringInput guid="d4132384-2b65-49f9-99d2-becd7bacc563" type="CoreNodeModels.Input.StringInput" nickname="String" x="199.619551378319" y="389.016113153089" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="True" IsFrozen="false">
+      <System.String>C:\Users\danil\Documents\GitHub\space-syntax\00-base files\toronto_data_160218_manDiv.json</System.String>
+      <System.String value="C:\Users\danil\Documents\GitHub\space-syntax\00-base files\toronto_data_160218_manDiv.json" />
+    </CoreNodeModels.Input.StringInput>
+    <Dynamo.Graph.Nodes.ZeroTouch.DSFunction guid="496ccdd8-7653-42f7-8967-0a94bb713a74" type="Dynamo.Graph.Nodes.ZeroTouch.DSFunction" nickname="File.ReadText" x="436.829357140274" y="388.393611347004" isVisible="true" isUpstreamVisible="true" lacing="Shortest" isSelectedInput="False" IsFrozen="false" assembly="DSCoreNodes.dll" function="DSCore.IO.File.ReadText@var" />
+    <PythonNodeModels.PythonNode guid="9cdcc41e-ebbc-45bd-8383-75c801c02904" type="PythonNodeModels.PythonNode" nickname="Python Script" x="744.387989821262" y="302.438155549798" isVisible="true" isUpstreamVisible="true" lacing="Disabled" isSelectedInput="False" IsFrozen="false" inputcount="2">
+      <Script>import clr
+
+import sys
+sys.path.append('C:\Program Files (x86)\IronPython 2.7\Lib') 
+
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+#The inputs to this node will be stored as a list in the IN variables.
+dataEnteringNode = IN
+
+import json
+
+pts_data = json.loads(IN[0])
+
+lines = []
+	
+	
+
+employee_data = json.loads(IN[1])
+
+ids_survey = [x["_id"] for x in employee_data["employees"]]
+
+for key in pts_data.keys():
+
+	pt1_coords = pts_data[key]
+	
+	pt1 = Point.ByCoordinates(pt1_coords[0], pt1_coords[1], pt1_coords[2])
+
+	neighbors = employee_data["employees"][ids_survey.index(int(key))]["neighbor_id"]
+
+	for neighbor in neighbors:
+		try:
+			pt2_coords = pts_data[str(neighbor)]
+			pt2 = Point.ByCoordinates(pt2_coords[0], pt2_coords[1], pt2_coords[2])
+			lines.append(Line.ByStartPointEndPoint(pt1, pt2))
+		except KeyError:
+			pass
+			
+
+
+
+
+#Assign your output to the OUT variable.
+OUT = lines
+</Script>
+    </PythonNodeModels.PythonNode>
+  </Elements>
+  <Connectors>
+    <Dynamo.Graph.Connectors.ConnectorModel start="e6145fc9-7ac9-42e7-b8da-9ee0186a41a8" start_index="0" end="873e3677-63a6-4b28-925a-927a1883bf4a" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="f7dc4ef6-0505-47c2-9e3f-0b75f5cd4d2f" start_index="0" end="eaa7bb40-7c11-457b-8a7c-33a1e3926bb5" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="eaa7bb40-7c11-457b-8a7c-33a1e3926bb5" start_index="0" end="cbf5ccf5-4751-4723-b129-08d5aadeaea9" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="eaa7bb40-7c11-457b-8a7c-33a1e3926bb5" start_index="0" end="9cdcc41e-ebbc-45bd-8383-75c801c02904" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="d4132384-2b65-49f9-99d2-becd7bacc563" start_index="0" end="496ccdd8-7653-42f7-8967-0a94bb713a74" end_index="0" portType="0" />
+    <Dynamo.Graph.Connectors.ConnectorModel start="496ccdd8-7653-42f7-8967-0a94bb713a74" start_index="0" end="9cdcc41e-ebbc-45bd-8383-75c801c02904" end_index="1" portType="0" />
+  </Connectors>
+  <Notes />
+  <Annotations />
+  <Presets />
+  <Cameras>
+    <Camera Name="Background Preview" eyeX="-1509.66580817882" eyeY="-809.951286541952" eyeZ="651.897463101443" lookX="651.050426199933" lookY="1384.13592228585" lookZ="-613.746994680489" upX="-0.681565300120013" upY="0.350207381259476" upZ="0.642513448718185" />
+  </Cameras>
+</Workspace>
